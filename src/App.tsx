@@ -1,38 +1,35 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import reactLogo from './assets/react.svg';
-import { MainNav } from './components/core/main-nav';
+import {
+  createBrowserRouter,
+  RouteObject,
+  RouterProvider,
+} from 'react-router-dom';
+import { Home } from '@/screens/home';
+import {
+  CalendarNotOptimized,
+  CalendarOptimizedWithMemoization,
+  CalendarOptimizedWithStore,
+} from '@/screens/calendar';
 
-const router = createBrowserRouter([
+const routes: RouteObject[] = [
   {
     path: '/',
-    element: (
-      <div>
-        <MainNav />
-        <div className="max-w-7xl mx-auto px-8 text-center">
-          <div className="flex place-content-center my-10">
-            <a href="https://reactjs.org" target="_blank" rel="noreferrer">
-              <img
-                src={reactLogo}
-                className="h-16 will-change-[filter] motion-safe:animate-spin-slow"
-                alt="React logo"
-              />
-            </a>
-          </div>
-          <h1 className="text-5xl">Profiling React Apps</h1>
-        </div>
-      </div>
-    ),
+    element: <Home />,
   },
   {
-    path: 'calendar',
-    element: (
-      <div>
-        <MainNav />
-        <div>Calendar</div>
-      </div>
-    ),
+    path: 'calendar-not-optimized',
+    element: <CalendarNotOptimized />,
   },
-]);
+  {
+    path: 'calendar-optimized-memoization',
+    element: <CalendarOptimizedWithMemoization />,
+  },
+  {
+    path: 'calendar-optimized-store',
+    element: <CalendarOptimizedWithStore />,
+  },
+];
+
+const router = createBrowserRouter(routes);
 
 function App() {
   return <RouterProvider router={router} />;

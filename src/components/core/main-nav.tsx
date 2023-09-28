@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import {
   NavLink as RouterNavLink,
   NavLinkProps as RouterNavLinkProps,
@@ -11,22 +12,12 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
 
-const NavLink = ({ to, ...props }: RouterNavLinkProps) => {
-  const href = useHref(to);
-  const match = useMatch(href);
-
+export const MainNav = memo(function MainNav() {
   return (
-    <NavigationMenuLink active={match !== null} asChild>
-      <RouterNavLink to={to} {...props} />
-    </NavigationMenuLink>
-  );
-};
-
-export function MainNav() {
-  return (
-    <NavigationMenu>
+    <NavigationMenu className="p-2">
       <NavigationMenuList>
         <NavigationMenuItem>
           <NavLink to="/">Home</NavLink>
@@ -34,10 +25,48 @@ export function MainNav() {
         <NavigationMenuItem>
           <NavigationMenuTrigger>Calendar</NavigationMenuTrigger>
           <NavigationMenuContent>
-            <NavLink to="/calendar">Calendar (Not optimized)</NavLink>
+            <NavUl>
+              <li>
+                <NavLink to="/calendar-not-optimized">
+                  Calendar (Not optimized)
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/calendar-optimized-memoization">
+                  Calendar (Optimized using Memoization)
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/calendar-optimized-store">
+                  Calendar (Optimized using a Store)
+                </NavLink>
+              </li>
+            </NavUl>
           </NavigationMenuContent>
         </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>
   );
+});
+
+// Subcomponents
+// =============================================================================
+
+function NavLink({ to, ...props }: RouterNavLinkProps) {
+  const href = useHref(to);
+  const match = useMatch(href);
+
+  return (
+    <NavigationMenuLink
+      className={navigationMenuTriggerStyle()}
+      active={match !== null}
+      asChild
+    >
+      <RouterNavLink to={to} {...props} />
+    </NavigationMenuLink>
+  );
+}
+
+function NavUl({ children }: { children: React.ReactNode }) {
+  return <ul className="grid gap-3 p-4">{children}</ul>;
 }
