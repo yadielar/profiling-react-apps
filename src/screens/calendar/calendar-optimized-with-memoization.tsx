@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { Typography } from '@/components/ui/typography';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Layout, LayoutMain, LayoutSidebar } from '@/components/core/layout';
@@ -14,15 +14,30 @@ import {
 export function CalendarOptimizedWithMemoization() {
   const [selectedEventIds, setSelectedEventIds] = useState<string[]>([]);
 
-  function handleToggleSelectedEvent(eventId: string, checked: boolean) {
-    if (checked) {
-      setSelectedEventIds([...selectedEventIds, eventId]);
-    } else {
-      setSelectedEventIds(
-        selectedEventIds.filter(selectedEventId => selectedEventId !== eventId)
-      );
-    }
-  }
+  // We're doing two things that will help us optimize re-renders:
+  // 1. We're using the `useCallback` hook to memoize the function reference.
+  //    This will help us optimize the `EventCard` component because it will
+  //    receive the same function reference on every render.
+  // 2. We're using the updater function form of setState. This avoids the need
+  //    to include `selectedEventIds` in the dependency array of `useCallback`,
+  //    which would cause the function reference to change.
+  const handleToggleSelectedEvent = useCallback(
+    (eventId: string, checked: boolean) => {
+      if (checked) {
+        setSelectedEventIds(prevSelectedEventIds => [
+          ...prevSelectedEventIds,
+          eventId,
+        ]);
+      } else {
+        setSelectedEventIds(prevSelectedEventIds =>
+          prevSelectedEventIds.filter(
+            selectedEventId => selectedEventId !== eventId
+          )
+        );
+      }
+    },
+    []
+  );
 
   return (
     <Layout>
@@ -76,7 +91,11 @@ function Day({
   );
 }
 
-function EventCard({
+// We memoize the component so that it only re-renders when its props change.
+// We will see a performance improvement here when calendar events are selected
+// because the `event` and `isSelected` props will only change for the events
+// that were toggled, and the `onToggleSelected` prop is stable.
+const EventCard = memo(function EventCard({
   event,
   isSelected,
   onToggleSelected,
@@ -95,4 +114,4 @@ function EventCard({
       />
     </CalendarCard>
   );
-}
+});

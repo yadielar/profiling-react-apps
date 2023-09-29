@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { create } from 'zustand';
 import { Typography } from '@/components/ui/typography';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Layout, LayoutMain, LayoutSidebar } from '@/components/core/layout';
@@ -11,19 +11,30 @@ import {
   CalendarRow,
 } from './components';
 
-export function CalendarOptimizedWithStore() {
-  const [selectedEventIds, setSelectedEventIds] = useState<string[]>([]);
+// We're using Zustand to create a store that will hold the selected events.
+const useCalendarStore = create(() => ({
+  selectedEventIds: [] as string[],
+}));
 
-  function handleToggleSelectedEvent(eventId: string, checked: boolean) {
+// We're creating a function that will be used to toggle the selected events.
+// Since it's created outside of any component, it's reference is stable.
+const toggleSelectedEvent = (eventId: string, checked: boolean) => {
+  useCalendarStore.setState(state => {
     if (checked) {
-      setSelectedEventIds([...selectedEventIds, eventId]);
+      return {
+        selectedEventIds: [...state.selectedEventIds, eventId],
+      };
     } else {
-      setSelectedEventIds(
-        selectedEventIds.filter(selectedEventId => selectedEventId !== eventId)
-      );
+      return {
+        selectedEventIds: state.selectedEventIds.filter(
+          selectedEventId => selectedEventId !== eventId
+        ),
+      };
     }
-  }
+  });
+};
 
+export function CalendarOptimizedWithStore() {
   return (
     <Layout>
       <LayoutSidebar>
@@ -38,12 +49,7 @@ export function CalendarOptimizedWithStore() {
           {calendarData.weeks.map((week, weekIndex) => (
             <CalendarRow key={weekIndex}>
               {week.map(day => (
-                <Day
-                  key={day.dayFormatted}
-                  events={day.events}
-                  selectedEventIds={selectedEventIds}
-                  onToggleSelectedEvent={handleToggleSelectedEvent}
-                />
+                <Day key={day.dayFormatted} events={day.events} />
               ))}
             </CalendarRow>
           ))}
@@ -53,43 +59,29 @@ export function CalendarOptimizedWithStore() {
   );
 }
 
-function Day({
-  events,
-  selectedEventIds,
-  onToggleSelectedEvent,
-}: {
-  events: CalendarEvent[];
-  selectedEventIds: string[];
-  onToggleSelectedEvent: (eventId: string, checked: boolean) => void;
-}) {
+function Day({ events }: { events: CalendarEvent[] }) {
   return (
     <CalendarCell>
       {events.map(event => (
-        <EventCard
-          key={event.id}
-          event={event}
-          isSelected={selectedEventIds.includes(event.id)}
-          onToggleSelected={onToggleSelectedEvent}
-        />
+        <EventCard key={event.id} event={event} />
       ))}
     </CalendarCell>
   );
 }
 
-function EventCard({
-  event,
-  isSelected,
-  onToggleSelected,
-}: {
-  event: CalendarEvent;
-  isSelected: boolean;
-  onToggleSelected: (eventId: string, checked: boolean) => void;
-}) {
+function EventCard({ event }: { event: CalendarEvent }) {
+  // We're using Zustand's hook with a selector to get the relevant state for
+  // this component. Zustand will only trigger a re-render of this component if
+  // the value returned from the selector changes.
+  const isSelected = useCalendarStore(state =>
+    state.selectedEventIds.includes(event.id)
+  );
+
   return (
     <CalendarCard isSelected={isSelected}>
       <Checkbox
         onCheckedChange={checked =>
-          onToggleSelected(event.id, checked === true)
+          toggleSelectedEvent(event.id, checked === true)
         }
         checked={isSelected}
       />
