@@ -1,9 +1,9 @@
-import { useRef, useState } from 'react';
-import { cn } from '@/lib/utils';
+import * as z from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Layout, LayoutMain, LayoutSidebar } from '@/components/core/layout';
 import { Typography } from '@/components/ui/typography';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import {
@@ -13,57 +13,51 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { useToast } from '@/components/ui/use-toast';
 import { getFruitEmoji } from './utils';
+
+const formSchema = z.object({
+  firstName: z.string().nonempty('First name is required'),
+  lastName: z.string().nonempty('Last name is required'),
+  aboutMe: z.string().optional(),
+  favoriteFruit: z.string({
+    required_error: 'Favorite fruit is required',
+  }),
+});
 
 export function FormOptimizedWithEncapsulation() {
   const { toast } = useToast();
 
-  const formRef = useRef<HTMLFormElement | null>(null);
-  const [validating, setValidating] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  // Form state is now handled in a store by React Hook Form and does not
+  // trigger re-renders unless we explicitly subscribe to it using RHF's hooks.
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      aboutMe: '',
+      favoriteFruit: undefined,
+    },
+  });
 
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [aboutMe, setAboutMe] = useState('');
-  const [favoriteFruit, setFavoriteFruit] = useState<string>();
-
-  function handleFieldChange<
-    E extends
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
-      | string
-  >(handler: (event: E) => void) {
-    return (event: E) => {
-      validate();
-      handler(event);
-    };
-  }
-
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    const form = event.currentTarget;
-
-    if (!form.reportValidity()) {
-      setValidating(true);
-      validate();
-      return;
-    }
+  function handleSubmit(values: z.infer<typeof formSchema>) {
+    // Form state is stored by RHF in an internal store, so there are no
+    // reactive values of form state in scope anymore. Handily, RHF provides the
+    // latest values in the submit event.
+    const { firstName, lastName, favoriteFruit } = values;
 
     toast({
       description: `Thank you ${firstName} ${lastName}! ${getFruitEmoji(
         favoriteFruit
       )}`,
-    });
-  }
-
-  function validate() {
-    const form = formRef.current!;
-    setErrors({
-      firstName: form.firstName.validationMessage,
-      lastName: form.lastName.validationMessage,
-      favoriteFruit: form.favoriteFruit.validationMessage,
     });
   }
 
@@ -77,84 +71,90 @@ export function FormOptimizedWithEncapsulation() {
         </div>
       </LayoutSidebar>
       <LayoutMain>
-        <form ref={formRef} noValidate onSubmit={handleSubmit}>
-          <div className="max-w-sm mx-auto p-6 space-y-6">
-            <Typography variant="h4" component="h2">
-              My Profile
-            </Typography>
-            <div className="grid items-center gap-1.5">
-              <Label htmlFor="firstName">First Name</Label>
-              <Input
-                className={cn(
-                  validating && errors['firstName'] && 'border-red-500'
-                )}
-                type="text"
-                id="firstName"
-                placeholder="First Name"
-                required
-                value={firstName}
-                onChange={handleFieldChange(event =>
-                  setFirstName(event.target.value)
-                )}
-              />
-            </div>
-            <div className="grid items-center gap-1.5">
-              <Label htmlFor="lastName">Last Name</Label>
-              <Input
-                className={cn(
-                  validating && errors['lastName'] && 'border-red-500'
-                )}
-                type="text"
-                id="lastName"
-                placeholder="Last Name"
-                required
-                value={lastName}
-                onChange={handleFieldChange(event =>
-                  setLastName(event.target.value)
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)}>
+            <div className="max-w-sm mx-auto p-6 space-y-6">
+              <Typography variant="h4" component="h2">
+                My Profile
+              </Typography>
+              {/*
+                Although our form field state is controlled, each field is now
+                encapsulated in its own component (FormField) and any re-renders
+                are isolated to that component.
+               */}
+              <FormField
+                control={form.control}
+                name="firstName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>First Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="First Name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
               />
-            </div>
-            <div className="grid gap-1.5">
-              <Label htmlFor="aboutMe">About Me</Label>
-              <Textarea
-                placeholder="Something about yourself."
-                id="aboutMe"
-                value={aboutMe}
-                onChange={handleFieldChange(event =>
-                  setAboutMe(event.target.value)
+              <FormField
+                control={form.control}
+                name="lastName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Last Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Last Name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
               />
-            </div>
-            <div className="grid items-center gap-1.5">
-              <Label htmlFor="favoriteFruitTrigger">Favorite Fruit</Label>
-              <Select
+              <FormField
+                control={form.control}
+                name="aboutMe"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>About Me</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Something about yourself."
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
                 name="favoriteFruit"
-                required
-                value={favoriteFruit}
-                onValueChange={handleFieldChange(value =>
-                  setFavoriteFruit(value)
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Favorite Fruit</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a fruit" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="apple">Apple</SelectItem>
+                        <SelectItem value="banana">Banana</SelectItem>
+                        <SelectItem value="strawberry">Strawberry</SelectItem>
+                        <SelectItem value="grapes">Grapes</SelectItem>
+                        <SelectItem value="pineapple">Pineapple</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
                 )}
-              >
-                <SelectTrigger
-                  id="favoriteFruitTrigger"
-                  className={cn(
-                    validating && errors['favoriteFruit'] && 'border-red-500'
-                  )}
-                >
-                  <SelectValue placeholder="Select a fruit" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="apple">Apple</SelectItem>
-                  <SelectItem value="banana">Banana</SelectItem>
-                  <SelectItem value="strawberry">Strawberry</SelectItem>
-                  <SelectItem value="grapes">Grapes</SelectItem>
-                  <SelectItem value="pineapple">Pineapple</SelectItem>
-                </SelectContent>
-              </Select>
+              />
+              <Button>Save</Button>
             </div>
-            <Button>Save</Button>
-          </div>
-        </form>
+          </form>
+        </Form>
       </LayoutMain>
     </Layout>
   );

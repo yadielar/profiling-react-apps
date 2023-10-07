@@ -23,21 +23,32 @@ export function FormOptimizedWithUncontrolled() {
   const [validating, setValidating] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [aboutMe, setAboutMe] = useState('');
-  const [favoriteFruit, setFavoriteFruit] = useState<string>();
-
+  // We're no longer controlling the form fields, however we still listen to
+  // changes so we can validate the field after each keystroke and update the
+  // errors if needed. We don't set a new errors object every time we validate,
+  // only when the error message actually changes.
   function handleFieldChange<
     E extends
       | React.ChangeEvent<HTMLInputElement>
       | React.ChangeEvent<HTMLTextAreaElement>
       | string
-  >(handler: (event: E) => void) {
-    return (event: E) => {
+  >(event: E) {
+    if (!validating) return;
+    if (typeof event === 'string') {
       validate();
-      handler(event);
-    };
+    } else {
+      const fieldName = event.target.id;
+      const currError = errors[fieldName];
+      const newError = event.target.validationMessage;
+      // only set a new error object if the message has changed, otherwise we
+      // would be re-rendering the entire form on every keystroke
+      if (currError !== newError) {
+        setErrors(prevErrors => ({
+          ...prevErrors,
+          [fieldName]: newError,
+        }));
+      }
+    }
   }
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -50,6 +61,13 @@ export function FormOptimizedWithUncontrolled() {
       validate();
       return;
     }
+
+    // We're no longer controlling the form fields, so there are no reactive
+    // values of form state in scope anymore. Therefore we need to get the
+    // values from the form element directly.
+    const firstName = form.firstName.value;
+    const lastName = form.lastName.value;
+    const favoriteFruit = form.favoriteFruit.value;
 
     toast({
       description: `Thank you ${firstName} ${lastName}! ${getFruitEmoji(
@@ -82,6 +100,12 @@ export function FormOptimizedWithUncontrolled() {
             <Typography variant="h4" component="h2">
               My Profile
             </Typography>
+            {/*
+              Removing the `value` prop from the inputs means we're no longer
+              controlling the form fields. Any data entered into the fields is
+              now stored in the DOM, not in React state. Since they're no longer
+              reactive state values, no re-renders are triggered.
+             */}
             <div className="grid items-center gap-1.5">
               <Label htmlFor="firstName">First Name</Label>
               <Input
@@ -92,10 +116,9 @@ export function FormOptimizedWithUncontrolled() {
                 id="firstName"
                 placeholder="First Name"
                 required
-                value={firstName}
-                onChange={handleFieldChange(event =>
-                  setFirstName(event.target.value)
-                )}
+                onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  handleFieldChange(e)
+                }
               />
             </div>
             <div className="grid items-center gap-1.5">
@@ -108,10 +131,9 @@ export function FormOptimizedWithUncontrolled() {
                 id="lastName"
                 placeholder="Last Name"
                 required
-                value={lastName}
-                onChange={handleFieldChange(event =>
-                  setLastName(event.target.value)
-                )}
+                onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  handleFieldChange(e)
+                }
               />
             </div>
             <div className="grid gap-1.5">
@@ -119,10 +141,9 @@ export function FormOptimizedWithUncontrolled() {
               <Textarea
                 placeholder="Something about yourself."
                 id="aboutMe"
-                value={aboutMe}
-                onChange={handleFieldChange(event =>
-                  setAboutMe(event.target.value)
-                )}
+                onInput={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                  handleFieldChange(e)
+                }
               />
             </div>
             <div className="grid items-center gap-1.5">
@@ -130,10 +151,7 @@ export function FormOptimizedWithUncontrolled() {
               <Select
                 name="favoriteFruit"
                 required
-                value={favoriteFruit}
-                onValueChange={handleFieldChange(value =>
-                  setFavoriteFruit(value)
-                )}
+                onValueChange={handleFieldChange}
               >
                 <SelectTrigger
                   id="favoriteFruitTrigger"
