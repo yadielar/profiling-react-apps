@@ -44,6 +44,26 @@ export const MainNav = memo(function MainNav() {
             </NavUl>
           </NavigationMenuContent>
         </NavigationMenuItem>
+        <NavigationMenuItem>
+          <NavigationMenuTrigger>Form</NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <NavUl>
+              <li>
+                <NavLink to="/form-not-optimized">Form (Not optimized)</NavLink>
+              </li>
+              <li>
+                <NavLink to="/form-optimized-uncontrolled">
+                  Form (Optimized by making it Uncontrolled)
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/form-optimized-encapsulation">
+                  Form (Optimized using Encapsulation)
+                </NavLink>
+              </li>
+            </NavUl>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>
   );
