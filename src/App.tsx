@@ -15,6 +15,10 @@ import {
   FormOptimizedWithEncapsulation,
   FormOptimizedWithUncontrolled,
 } from '@/screens/form';
+import {
+  TableNotOptimized,
+  TableOptimizedWithVirtualization,
+} from '@/screens/table';
 
 const routes: RouteObject[] = [
   {
@@ -51,6 +55,15 @@ const routes: RouteObject[] = [
       {
         path: 'form-optimized-uncontrolled',
         element: <FormOptimizedWithUncontrolled />,
+      },
+      // table
+      {
+        path: 'table-not-optimized',
+        element: <TableNotOptimized />,
+      },
+      {
+        path: 'table-optimized-virtualization',
+        element: <TableOptimizedWithVirtualization />,
       },
     ],
   },

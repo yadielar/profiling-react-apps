@@ -32,17 +32,31 @@ function Layout({ children }: LayoutProps) {
   );
 }
 
-function LayoutSidebar({ children }: LayoutProps) {
+type LayoutSidebarProps = {
+  children: React.ReactNode;
+};
+
+function LayoutSidebar({ children }: LayoutSidebarProps) {
   return (
-    <aside className="overflow-y-auto bg-white dark:bg-slate-950 md:border-r border-slate-200 dark:border-slate-800">
+    <aside className="md:overflow-y-auto bg-white dark:bg-slate-950 md:border-r border-slate-200 dark:border-slate-800">
       {children}
     </aside>
   );
 }
 
-function LayoutMain({ children }: LayoutProps) {
+type LayoutMainProps = {
+  hideOverflow?: boolean;
+  children: React.ReactNode;
+};
+
+function LayoutMain({ children, hideOverflow = false }: LayoutMainProps) {
   return (
-    <main className="overflow-y-auto bg-white dark:bg-slate-950">
+    <main
+      className={cn(
+        'bg-white dark:bg-slate-950',
+        hideOverflow ? 'md:h-full md:overflow-hidden' : 'md:overflow-y-auto'
+      )}
+    >
       {children}
     </main>
   );

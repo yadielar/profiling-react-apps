@@ -64,6 +64,23 @@ export const MainNav = memo(function MainNav() {
             </NavUl>
           </NavigationMenuContent>
         </NavigationMenuItem>
+        <NavigationMenuItem>
+          <NavigationMenuTrigger>Table</NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <NavUl>
+              <li>
+                <NavLink to="/table-not-optimized">
+                  Table (Not optimized)
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/table-optimized-virtualization">
+                  Table (Optimized by using Virtualization)
+                </NavLink>
+              </li>
+            </NavUl>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>
   );
