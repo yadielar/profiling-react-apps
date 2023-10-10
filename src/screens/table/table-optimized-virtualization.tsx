@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { cn } from '@/lib/utils';
 import { Layout, LayoutMain, LayoutSidebar } from '@/components/core/layout';
 import { Typography } from '@/components/ui/typography';
@@ -14,8 +15,18 @@ import { makeData } from './utils';
 import { SelectedBadge } from './components';
 
 export function TableOptimizedWithVirtualization() {
-  const [data] = useState(() => makeData(5000));
+  // Since we're virtualizing the list of rows, we can use any large number
+  const [data] = useState(() => makeData(50_000));
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
+
+  const parentRef = useRef<HTMLDivElement>(null);
+
+  const virtualizer = useVirtualizer({
+    count: data.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 53,
+    overscan: 20,
+  });
 
   function handleSelectRow(id: number) {
     setSelectedRows(prev => {
@@ -42,7 +53,10 @@ export function TableOptimizedWithVirtualization() {
         </div>
       </LayoutSidebar>
       <LayoutMain hideOverflow>
-        <div className="hidden md:block md:h-full md:overflow-y-auto relative">
+        <div
+          className="hidden md:block md:h-full md:overflow-y-auto relative"
+          ref={parentRef}
+        >
           <div
             className={
               selectedRows.length > 0
@@ -55,7 +69,7 @@ export function TableOptimizedWithVirtualization() {
               onClear={clearSelectedRows}
             />
           </div>
-          <div>
+          <div style={{ height: `${virtualizer.getTotalSize()}px` }}>
             <Table>
               <TableHeader>
                 <TableRow>
@@ -70,12 +84,19 @@ export function TableOptimizedWithVirtualization() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {data.map(row => {
+                {virtualizer.getVirtualItems().map((virtualRow, index) => {
+                  const row = data[virtualRow.index];
                   const selected = selectedRows.includes(row.id);
                   return (
                     <TableRow
                       key={row.id}
                       className={cn(selected && 'bg-blue-50 hover:bg-blue-50')}
+                      style={{
+                        height: `${virtualRow.size}px`,
+                        transform: `translateY(${
+                          virtualRow.start - index * virtualRow.size
+                        }px)`,
+                      }}
                       onClick={() => handleSelectRow(row.id)}
                     >
                       <TableCell>{row.id}</TableCell>
