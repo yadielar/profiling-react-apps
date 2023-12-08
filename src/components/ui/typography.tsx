@@ -8,6 +8,7 @@ const typographyVariants = cva('font-sans', {
       h3: 'scroll-m-20 text-2xl font-semibold tracking-tight',
       h4: 'scroll-m-20 text-xl font-semibold tracking-tight',
       p: 'text-base [&:not(:first-child)]:mt-4',
+      code: 'relative rounded bg-orange-100 px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold',
     },
   },
   defaultVariants: {
@@ -16,8 +17,8 @@ const typographyVariants = cva('font-sans', {
 });
 
 type TypographyProps = {
-  variant?: 'h1' | 'h2' | 'h3' | 'h4' | 'p';
-  component?: 'h1' | 'h2' | 'h3' | 'h4' | 'p';
+  variant?: 'h1' | 'h2' | 'h3' | 'h4' | 'p' | 'code';
+  component?: 'h1' | 'h2' | 'h3' | 'h4' | 'p' | 'code';
   children?: React.ReactNode;
 };
 
