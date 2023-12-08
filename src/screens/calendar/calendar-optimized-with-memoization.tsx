@@ -46,6 +46,17 @@ export function CalendarOptimizedWithMemoization() {
           <Typography variant="h4" component="h1">
             Calendar (Optimized using Memoization)
           </Typography>
+          <Typography variant="p">
+            This calendar is optimized using memoization tools such as{' '}
+            <Typography variant="code">memo</Typography> and{' '}
+            <Typography variant="code">useCallback</Typography>. By memoizing
+            the <em>EventCard</em> component, only the card that was selected
+            re-renders.
+          </Typography>
+          <Typography variant="p">
+            However, there's no easy way to memoize the <em>CalendarRow</em> and{' '}
+            <em>Day</em> components, so they all still re-render.
+          </Typography>
         </div>
       </LayoutSidebar>
       <LayoutMain>

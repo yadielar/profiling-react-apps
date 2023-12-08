@@ -88,9 +88,18 @@ export function FormOptimizedWithUncontrolled() {
   return (
     <Layout>
       <LayoutSidebar>
-        <div className="p-4">
+        <div className="p-6">
           <Typography variant="h4" component="h1">
             Form (Optimized by making it Uncontrolled)
+          </Typography>
+          <Typography variant="p">
+            This form is optimized by making the fields uncontrolled. Typing or
+            modifying any of the form fields will not cause any re-renders.
+          </Typography>
+          <Typography variant="p">
+            Any data entered into the fields is now stored in the DOM, not in
+            React state. Since they're no longer reactive state values, no
+            re-renders are triggered.
           </Typography>
         </div>
       </LayoutSidebar>

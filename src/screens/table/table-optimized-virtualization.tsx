@@ -50,6 +50,15 @@ export function TableOptimizedWithVirtualization() {
           <Typography variant="h4" component="h1">
             Table (Optimized with Virtualization)
           </Typography>
+          <Typography variant="p">
+            This table is optimized using virtualization. It will only render
+            the rows that are visible in the viewport.
+          </Typography>
+          <Typography variant="p">
+            Since it only renders the rows that are visible and and it will only
+            re-render them when they scroll into view, it can render thousands
+            of rows without any performance issues.
+          </Typography>
         </div>
       </LayoutSidebar>
       <LayoutMain hideOverflow>

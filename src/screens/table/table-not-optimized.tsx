@@ -39,6 +39,16 @@ export function TableNotOptimized() {
           <Typography variant="h4" component="h1">
             Table (Not Optimized)
           </Typography>
+          <Typography variant="p">
+            This table is not optimized. It will render all 5,000 rows when the
+            page mounts, and it will re-render all of them again on every state
+            change.
+          </Typography>
+          <Typography variant="p">
+            Since rendering thousands of rows is expensive, it takes a long time
+            to render initially and after updates, making the app unresponsive
+            every time the user interacts with it.
+          </Typography>
         </div>
       </LayoutSidebar>
       <LayoutMain hideOverflow>

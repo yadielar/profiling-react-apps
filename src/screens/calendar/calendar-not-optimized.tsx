@@ -31,6 +31,15 @@ export function CalendarNotOptimized() {
           <Typography variant="h4" component="h1">
             Calendar (Not Optimized)
           </Typography>
+          <Typography variant="p">
+            This calendar is not optimized. It will re-render the entire
+            component tree on every state change.
+          </Typography>
+          <Typography variant="p">
+            This may not cause performance issues when there are only a few
+            event cards, but it could cause performance issues when there are
+            hundreds or thousands of them.
+          </Typography>
         </div>
       </LayoutSidebar>
       <LayoutMain>

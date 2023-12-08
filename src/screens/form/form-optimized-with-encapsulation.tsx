@@ -64,9 +64,21 @@ export function FormOptimizedWithEncapsulation() {
   return (
     <Layout>
       <LayoutSidebar>
-        <div className="p-4">
+        <div className="p-6">
           <Typography variant="h4" component="h1">
             Form (Optimized with Encapsulation)
+          </Typography>
+          <Typography variant="p">
+            This form is optimized using encapsulation. Each form field is
+            encapsulated in its own component, and any re-renders are isolated
+            to that component.
+          </Typography>
+          <Typography variant="p">
+            Form state is now handled in a store by React Hook Form and does not
+            trigger re-renders unless we explicitly subscribe to it using RHF's
+            hooks. Although our form field state is controlled, each field is
+            now encapsulated in its own component (FormField) and any re-renders
+            are isolated to that component.
           </Typography>
         </div>
       </LayoutSidebar>

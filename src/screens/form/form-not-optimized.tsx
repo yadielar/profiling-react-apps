@@ -70,9 +70,19 @@ export function FormNotOptimized() {
   return (
     <Layout>
       <LayoutSidebar>
-        <div className="p-4">
+        <div className="p-6">
           <Typography variant="h4" component="h1">
             Form (Not Optimized)
+          </Typography>
+          <Typography variant="p">
+            This form is not optimized. It will re-render the entire component
+            tree after every keystroke on a single input field.
+          </Typography>
+          <Typography variant="p">
+            This may not cause performance issues when there are only a few
+            simple form fields. But if there are many complex fields, such as
+            comboboxes, date pickers and the like, then typing on an input field
+            could feel sluggish or unresponsive.
           </Typography>
         </div>
       </LayoutSidebar>

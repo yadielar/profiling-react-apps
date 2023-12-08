@@ -42,6 +42,17 @@ export function CalendarOptimizedWithStore() {
           <Typography variant="h4" component="h1">
             Calendar (Optimized using a Store)
           </Typography>
+          <Typography variant="p">
+            This calendar is optimized using a Zustand store. The store holds
+            the selection state, and by using a selector to subscribe for state
+            changes inside the <em>EventCard</em>, we can optimize the component
+            so that only the selected cards re-render.
+          </Typography>
+          <Typography variant="p">
+            Since only the affected card re-renders, neither{' '}
+            <em>CalendarRow</em> nor <em>Day</em>, nor any other components
+            re-render.
+          </Typography>
         </div>
       </LayoutSidebar>
       <LayoutMain>
