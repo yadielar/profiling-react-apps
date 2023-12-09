@@ -1,30 +1,20 @@
-# React + TypeScript + Vite
+# Profiling React Apps
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React app with various examples of common performance problems and optimizations.
 
-Currently, two official plugins are available:
+## Featured examples
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Calendar.** A calendar with many event cards where each card can be selected and the state change be propagated to the whole component tree.
+- **Form.** A form with many fields where typing on an input causes the whole form to re-render on each keystroke.
+- **Table.** A table with thousands of rows that makes the app unresponsive every time the user interacts with it.
 
-## Expanding the ESLint configuration
+## Running the app
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+This app was created using the **[React + TypeScript](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts)** template for Vite.
 
-- Configure the top-level `parserOptions` property like this:
+To serve the project locally for development, clone the repo and run:
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
 ```
-
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+npm install
+npm run dev
+```
